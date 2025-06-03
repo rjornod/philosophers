@@ -1,7 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/03 16:17:42 by rojornod          #+#    #+#             */
+/*   Updated: 2025/06/03 16:52:36 by rojornod         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/time.h>
 
 
 typedef struct s_philo
@@ -17,3 +30,6 @@ typedef struct s_philo
 int	check_valid_input(char **argv);
 int	init_philo(char **argv, t_philo *philo, int argc);
 int	ft_atoi(const char *str);
+
+//time of day
+double	ms_time(void);

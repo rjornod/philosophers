@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/03 16:17:45 by rojornod          #+#    #+#             */
+/*   Updated: 2025/06/03 17:12:54 by rojornod         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../include/philo.h"
 
 int main(int argc, char **argv)
@@ -26,6 +38,10 @@ int main(int argc, char **argv)
 		else
 			return(printf("INVALID INPUT\n"));
 	}
+	while (1)
+	{
+		printf("%1.0f\n", ms_time());
+	}
 
 }
 
@@ -34,7 +50,6 @@ int	check_valid_input(char **argv)
 	int	i;
 	int	j;
 
-	
 	i = 1;
 	while (argv[i])
 	{
@@ -50,6 +65,16 @@ int	check_valid_input(char **argv)
 	return (1);
 }
 
+//converts tv_sec and tv_usec to milisecond
+double	ms_time(void)
+{
+	struct timeval tv;
+	{
+		gettimeofday(&tv, NULL);
+		return (((double)tv.tv_sec) * 1000) + (double)(tv.tv_usec / 1000);
+	};
+}
+
 int	init_philo(char **argv, t_philo *philo, int argc)
 {
 	philo->phil_num = ft_atoi(argv[1]);
@@ -58,7 +83,7 @@ int	init_philo(char **argv, t_philo *philo, int argc)
 	philo->t_sleep = ft_atoi(argv[4]);
 	if (argc == 6)
 		philo->n_time_eat = ft_atoi(argv[5]);
-	printf("[number of philos] %d\n", philo->phil_num);
+	printf("[%3f][number of philos] %d\n", ms_time(), philo->phil_num);
 	printf("[time to die] %d\n", philo->t_die);
 	printf("[time to eat] %d\n", philo->t_eat);
 	printf("[time to sleep] %d\n", philo->t_sleep);

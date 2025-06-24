@@ -3,11 +3,13 @@ NAME = philo
 CC = cc
 FLAGS = -Wall -Wextra -Werror
 
-SRC = main.c utils.c
+SRC = main.c utils.c input_check.c
 SRC_PATH = source
 OBJ_PATH = obj
 OBJ = $(SRC:%.c=$(OBJ_PATH)/%.o)
 
+all: $(NAME)
+	@echo "SUCCESSFULLY CREATED ./philo"
 
 $(OBJ_PATH):
 	@mkdir -p $(OBJ_PATH)
@@ -17,15 +19,11 @@ $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c | $(OBJ_PATH)
 
 $(NAME): $(OBJ)
 	@$(CC) $(FLAGS) $(OBJ) -o $(NAME)
-#	@echo "SUCCESS"
 
 clean:
 	@rm -f $(OBJ)
-	@rmdir $(OBJ_PATH)
+	@rm -rf $(OBJ_PATH)
 	@echo CLEANED SUCCESSFULLY
-
-all: $(NAME)
-	@echo "SUCCESSFULLY CREATED ./philo"
 
 fclean: clean
 	@rm -f $(NAME)

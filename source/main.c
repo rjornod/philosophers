@@ -6,11 +6,20 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 16:17:45 by rojornod          #+#    #+#             */
-/*   Updated: 2025/06/23 18:16:59 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/06/24 17:46:20 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/philo.h"
+
+static void *test_routine(void *arg)
+{
+	(void)arg;
+	printf("test from threads\n");
+	sleep(3);
+	printf("ending thread\n");
+	return (NULL);
+}
 
 int main(int argc, char **argv)
 {
@@ -23,8 +32,16 @@ int main(int argc, char **argv)
 	if (input_validation(argc, argv, philo) != 0)
 		exit(EXIT_FAILURE);
 	else
-		printf("time is %lld\n", ms_time());
-		//loop goes here
+	{
+		pthread_t t1;
+		pthread_t t2;
+
+		pthread_create(&t1,NULL, &test_routine, NULL);
+		pthread_create(&t2,NULL, &test_routine, NULL);
+		pthread_join(t1, NULL);
+		pthread_join(t2, NULL); 
+	}
+	return (0);
 }
 
 int	check_valid_input(char **argv)

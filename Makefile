@@ -1,7 +1,7 @@
 NAME = philo
 
 CC = cc
-FLAGS = -Wall -Wextra -Werror
+FLAGS = -Wall -Wextra -Werror -g -pthread
 
 SRC = main.c utils.c input_check.c
 SRC_PATH = source

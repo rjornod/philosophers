@@ -6,37 +6,37 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 16:17:42 by rojornod          #+#    #+#             */
-/*   Updated: 2025/06/27 15:26:44 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/07/01 17:03:51 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <pthread.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/time.h>
-#include <unistd.h>
-
+#ifndef PHILO_H
+# include <pthread.h>
+# include <stdlib.h>
+# include <stdio.h>
+# include <string.h>
+# include <sys/time.h>
+# include <unistd.h>
 
 typedef struct s_philo
 {
+	int				id;
 	int				phil_num;
 	int				t_die;
 	int				t_eat;
 	int				t_sleep;
 	int				n_time_eat;
 	int				is_dead;
-	int 			inc;
+	int				inc;
 	long long		start;
-	
+	pthread_t		*threads;
+	pthread_mutex_t	*forks;
 	pthread_mutex_t	print;
-	pthread_mutex_t r_fork;
-	pthread_mutex_t l_fork;
 }	t_philo;
 
 //initializing
-int			input_validation(int argc, char **argv, t_philo *philo);
-int			init_philo(char **argv, t_philo *philo, int argc);
+t_philo		*input_validation(int argc, char **argv);
+t_philo		*init_philo(char **argv, t_philo *philo, int argc);
 int			ft_atoi(const char *str);
 
 //time of day
@@ -44,4 +44,6 @@ long long	ms_time(void);
 void		print_tmsp_ms(t_philo *philo);
 
 //threads
-void		 *monitor_thread(void *arg);
+void		*monitor_thread(void *arg);
+
+#endif

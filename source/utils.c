@@ -6,7 +6,7 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 16:17:38 by rojornod          #+#    #+#             */
-/*   Updated: 2025/06/27 15:23:41 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/06/30 12:01:50 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,14 +42,13 @@ int	ft_atoi(const char *str)
 //converts tv_sec and tv_usec to milisecond
 long long	ms_time(void)
 {
-	struct timeval te;
-	{
-		gettimeofday(&te, NULL);
-		return (te.tv_sec * 1000LL + te.tv_usec / 1000);
-	};
+	struct timeval	te;
+
+	gettimeofday(&te, NULL);
+	return (te.tv_sec * 1000LL + te.tv_usec / 1000);
 }
 
-void print_tmsp_ms(t_philo *philo)
+void	print_tmsp_ms(t_philo *philo)
 {
 	long long	end;
 

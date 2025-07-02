@@ -6,7 +6,7 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 16:17:42 by rojornod          #+#    #+#             */
-/*   Updated: 2025/07/01 17:03:51 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/07/02 14:55:35 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ typedef struct s_philo
 	long long		start;
 	pthread_t		*threads;
 	pthread_mutex_t	*forks;
-	pthread_mutex_t	print;
+	pthread_mutex_t	*print;
 }	t_philo;
 
 //initializing
@@ -41,7 +41,7 @@ int			ft_atoi(const char *str);
 
 //time of day
 long long	ms_time(void);
-void		print_tmsp_ms(t_philo *philo);
+long long	print_tmsp_ms(t_philo *philo);
 
 //threads
 void		*monitor_thread(void *arg);

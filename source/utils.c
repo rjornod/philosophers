@@ -6,7 +6,7 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 16:17:38 by rojornod          #+#    #+#             */
-/*   Updated: 2025/06/30 12:01:50 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/07/02 15:35:22 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,10 +48,13 @@ long long	ms_time(void)
 	return (te.tv_sec * 1000LL + te.tv_usec / 1000);
 }
 
-void	print_tmsp_ms(t_philo *philo)
+long long	print_tmsp_ms(t_philo *philo)
 {
 	long long	end;
 
 	end = ms_time();
-	printf("%lld\n", end - philo->start);
+	// pthread_mutex_lock(philo->print);
+	// printf("%lld\n", end - philo->start);
+	// pthread_mutex_unlock(philo->print);
+	return (end - philo->start);
 }

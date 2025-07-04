@@ -6,7 +6,7 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 16:17:38 by rojornod          #+#    #+#             */
-/*   Updated: 2025/07/02 15:35:22 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/07/04 11:33:59 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,13 +39,20 @@ int	ft_atoi(const char *str)
 	return (result * sign);
 }
 
+long long time_since_last_meal(long long last_meal)
+{
+	long long now;
+	now = ms_time();
+	return (now - last_meal);
+}
+
 //converts tv_sec and tv_usec to milisecond
 long long	ms_time(void)
 {
 	struct timeval	te;
 
 	gettimeofday(&te, NULL);
-	return (te.tv_sec * 1000LL + te.tv_usec / 1000);
+	return (te.tv_sec * 1000LL + te.tv_usec / 1000); //use this for time since last meal etc
 }
 
 long long	print_tmsp_ms(t_philo *philo)
@@ -53,8 +60,5 @@ long long	print_tmsp_ms(t_philo *philo)
 	long long	end;
 
 	end = ms_time();
-	// pthread_mutex_lock(philo->print);
-	// printf("%lld\n", end - philo->start);
-	// pthread_mutex_unlock(philo->print);
 	return (end - philo->start);
 }

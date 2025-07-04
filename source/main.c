@@ -6,7 +6,7 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 16:17:45 by rojornod          #+#    #+#             */
-/*   Updated: 2025/07/03 16:45:40 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/07/04 15:54:07 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,59 +24,48 @@ void	*monitor_thread(void *arg)
 	return (NULL);
 }
 
-// static void	*test_routine(void *arg)
-// {
-// 	t_philo	*philo ;
-// 	int		i;
-
-// 	philo = arg;
-// 	i = 0;
-// 	pthread_mutex_lock(philo->print);
-// 	printf("*******************\n");
-// 	printf("* starting thread *\n");
-// 	//print_tmsp_ms(philo);
-// 	printf("[id] %d\n", philo->id);
-// 	philo->inc++;
-// 	usleep(3);
-// 	printf("* ending thread   *\n");
-// 	pthread_mutex_unlock(philo->print);
-// 	return (NULL);
-// }
-
 void	*main_routine(void *arg)
 {
 	t_philo	*philo;
 	int		l_fork;
 
 	philo = arg;
-	while (1)
+	if (philo->num_times_eat)
+	
+	while (philo->meals_eaten <= philo->num_times_eat)
 	{
 		l_fork = philo->id;
+		usleep(100);
 		pthread_mutex_lock(&philo->forks[l_fork]);
 		pthread_mutex_lock(philo->print);
-		printf("%lld %d has taken a fork\n", print_tmsp_ms(philo), philo->id);
+		printf(BLUE "%lld %d has taken a fork\n" WHITE, print_tmsp_ms(philo), philo->id);
 		pthread_mutex_unlock(philo->print);
 		pthread_mutex_lock(&philo->forks[(l_fork + 1) % philo->phil_num]);
 		pthread_mutex_lock(philo->print);
-		printf("%lld %d has taken a fork\n", print_tmsp_ms(philo), philo->id);
+		printf(BLUE "%lld %d has taken a fork\n" WHITE, print_tmsp_ms(philo), philo->id);
 		pthread_mutex_unlock(philo->print);
 		pthread_mutex_lock(philo->print);
-		printf("%lld %d is eating\n", print_tmsp_ms(philo), philo->id);
-		printf("%lld %d status is  %d\n", print_tmsp_ms(philo), philo->id, philo->phil_status);
+		printf(GREEN "%lld %d is eating\n" WHITE, print_tmsp_ms(philo), philo->id);
+		//printf(WHITE "//%lld %d has eaten %d meals\n", print_tmsp_ms(philo), philo->id, philo->meals_eaten);
 		pthread_mutex_unlock(philo->print);
 		usleep(philo->t_eat * 1000);
-		philo->phil_status = 1;
+		philo->time_of_last_meal = ms_time();
+		pthread_mutex_lock(philo->print);
+		pthread_mutex_unlock(philo->print);
+		pthread_mutex_lock(&philo->meals_eaten_mutex);
+		philo->meals_eaten++;
+		pthread_mutex_unlock(&philo->meals_eaten_mutex);
 		pthread_mutex_unlock(&philo->forks[l_fork]);
 		pthread_mutex_unlock(&philo->forks[(l_fork + 1) % philo->phil_num]);
+		pthread_mutex_lock(philo->print);
+		printf(YELLOW "%lld %d is sleeping\n" WHITE, print_tmsp_ms(philo), philo->id);
+		pthread_mutex_unlock(philo->print);
+		usleep(philo->t_sleep * 1000);
+		pthread_mutex_lock(philo->print);
+		printf(RED "%lld %d is thinking\n" WHITE, print_tmsp_ms(philo), philo->id);
+		pthread_mutex_unlock(philo->print);
+		usleep(150);
 	}
-	// pthread_mutex_lock(philo->print);
-	// printf("*******************\n");
-	// printf("* starting thread *\n");
-	// print_tmsp_ms(philo);
-	// philo->inc++;
-	// usleep(3);
-	// printf("* ending thread   *\n");
-	// pthread_mutex_unlock(&philo->print);
 	return (NULL);
 }
 
@@ -94,8 +83,6 @@ int	main_loop(t_philo *philo)
 		pthread_mutex_init(&philo->forks[i], NULL);
 		if (pthread_create(&philo->threads[i], NULL, &main_routine, &philo[i]) != 0)
 			return (perror("error creating thread"), 1);
-		if (i == 5)
-			philo->is_dead = 1;
 		i++;
 	}
 	i = 0;
@@ -105,6 +92,7 @@ int	main_loop(t_philo *philo)
 			return (perror("error joining threads"), 1);
 		i++;
 	}
+	//destroy all the mutexes after joining
 	pthread_mutex_destroy(philo->print);
 	free(philo->threads);
 	return (1);
@@ -171,15 +159,21 @@ t_philo	*init_philo(char **argv, t_philo *philo, int argc)
 		philo[i].t_sleep = ft_atoi(argv[4]);
 		philo[i].print = philo->print;
 		philo[i].start = start;
+		philo[i].is_dead = 0;
+		philo[i].meals_eaten = 0;
 		// philo[i].data = data;
 		if (argc == 6)
-			philo[i].n_time_eat = ft_atoi(argv[5]);
+			philo[i].num_times_eat = ft_atoi(argv[5]);
+		else
+			philo[i].num_times_eat = -1;
+		pthread_mutex_init(&philo[i].meals_eaten_mutex, NULL);
 		i++;
 	}
+	printf("[is dead] %d\n", philo->is_dead);
 	printf("[number of philos] %d\n", philo->phil_num);
 	printf("[time to die] %d\n", philo->t_die);
 	printf("[time to eat] %d\n", philo->t_eat);
 	printf("[time to sleep] %d\n", philo->t_sleep);
-	printf("[number of times to eat] %d\n", philo->n_time_eat);
+	printf("[number of times to eat] %d\n", philo->num_times_eat);
 	return (philo);
 }

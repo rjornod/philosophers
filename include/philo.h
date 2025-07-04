@@ -6,18 +6,19 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 16:17:42 by rojornod          #+#    #+#             */
-/*   Updated: 2025/07/04 15:12:36 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/07/04 16:14:23 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
+# define PHILO_H
 # include <pthread.h>
 # include <stdlib.h>
 # include <stdio.h>
 # include <string.h>
 # include <sys/time.h>
 # include <unistd.h>
-# define RED "\e[31m"
+# define RED "\e[91m"
 # define GREEN "\x1b[32m"
 # define YELLOW "\x1b[33m"
 # define BLUE "\x1b[34m"
@@ -27,7 +28,7 @@ typedef struct s_data
 {
 	int				dead;
 	long long		start;
-} 	t_data;
+}	t_data;
 
 typedef struct s_philo
 {
@@ -41,8 +42,8 @@ typedef struct s_philo
 	long long		start;
 	int				phil_status;
 	int				time_of_last_meal;
-	int 			meals_eaten;
-	pthread_mutex_t meals_eaten_mutex;
+	int				meals_eaten;
+	pthread_mutex_t	meals_eaten_mutex;
 	pthread_t		*threads;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	*print;

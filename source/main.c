@@ -6,7 +6,7 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 16:17:45 by rojornod          #+#    #+#             */
-/*   Updated: 2025/07/04 15:54:07 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/07/04 16:34:29 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,6 @@ void	*main_routine(void *arg)
 	int		l_fork;
 
 	philo = arg;
-	if (philo->num_times_eat)
-	
 	while (philo->meals_eaten <= philo->num_times_eat)
 	{
 		l_fork = philo->id;
@@ -46,7 +44,6 @@ void	*main_routine(void *arg)
 		pthread_mutex_unlock(philo->print);
 		pthread_mutex_lock(philo->print);
 		printf(GREEN "%lld %d is eating\n" WHITE, print_tmsp_ms(philo), philo->id);
-		//printf(WHITE "//%lld %d has eaten %d meals\n", print_tmsp_ms(philo), philo->id, philo->meals_eaten);
 		pthread_mutex_unlock(philo->print);
 		usleep(philo->t_eat * 1000);
 		philo->time_of_last_meal = ms_time();
@@ -58,13 +55,18 @@ void	*main_routine(void *arg)
 		pthread_mutex_unlock(&philo->forks[l_fork]);
 		pthread_mutex_unlock(&philo->forks[(l_fork + 1) % philo->phil_num]);
 		pthread_mutex_lock(philo->print);
+		printf(WHITE "//%lld %d has eaten %d meals\n", print_tmsp_ms(philo), philo->id, philo->meals_eaten);
+		pthread_mutex_unlock(philo->print);
+		if (philo->meals_eaten == philo->num_times_eat)
+			return (NULL);
+		pthread_mutex_lock(philo->print);
 		printf(YELLOW "%lld %d is sleeping\n" WHITE, print_tmsp_ms(philo), philo->id);
 		pthread_mutex_unlock(philo->print);
 		usleep(philo->t_sleep * 1000);
 		pthread_mutex_lock(philo->print);
 		printf(RED "%lld %d is thinking\n" WHITE, print_tmsp_ms(philo), philo->id);
 		pthread_mutex_unlock(philo->print);
-		usleep(150);
+		usleep(100);
 	}
 	return (NULL);
 }

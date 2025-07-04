@@ -6,7 +6,7 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/23 17:34:30 by rojornod          #+#    #+#             */
-/*   Updated: 2025/07/03 12:19:11 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/07/04 16:13:40 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,14 +19,15 @@ static int	check_positive_val(char **argv, int argc)
 	int	time_to_sleep;
 	int	number_of_philosophers;
 	int	number_times_to_eat;
-	
+
 	number_of_philosophers = ft_atoi(argv[1]);
 	time_to_die = ft_atoi(argv[2]);
 	time_to_eat = ft_atoi(argv[3]);
 	time_to_sleep = ft_atoi(argv[4]);
 	if (argc == 6)
-			number_times_to_eat = ft_atoi(argv[5]);
-	if ((number_of_philosophers <= 0) || (time_to_die <= 0) || (time_to_eat <= 0)
+		number_times_to_eat = ft_atoi(argv[5]);
+	if ((number_of_philosophers <= 0) || (time_to_die <= 0)
+		|| (time_to_eat <= 0)
 		|| (time_to_sleep <= 0))
 		return (0);
 	else
@@ -51,15 +52,14 @@ static int	check_input(char **argv, int argc)
 		i++;
 	}
 	if (check_positive_val(argv, argc) != 1)
-		return(0);
+		return (0);
 	return (1);
 }
 
-
 t_philo	*input_validation(int argc, char **argv)
 {
-	t_philo *philo;
-	
+	t_philo	*philo;
+
 	philo = NULL;
 	if (argc < 5 || argc > 6)
 	{

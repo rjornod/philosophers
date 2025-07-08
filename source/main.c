@@ -6,7 +6,7 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 16:17:45 by rojornod          #+#    #+#             */
-/*   Updated: 2025/07/04 16:34:29 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/07/08 16:52:33 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,38 @@
 
 void	*monitor_thread(void *arg)
 {
-	t_philo	*philo;
+	t_philo		*philo;
+	long long	now;
+	int			n;
+	int			i;
 
 	philo = arg;
-	if (philo->is_dead == 0)
+	n = philo->phil_num;
+	usleep(50);
+	while (philo->is_dead == 0)
 	{
-		printf("philospher is dead\n");
+		i = 0;
+		while (i < n)
+		{
+			pthread_mutex_lock(&philo[i].meal_time_mutex);
+			now = ms_time();		
+			if ((now - (philo[i].time_of_last_meal)) > philo->t_die)
+			{
+				philo[i].is_dead = 1;
+				pthread_mutex_lock(philo->print);
+				printf(WHITE "%lld %d died\n" WHITE, print_tmsp_ms(philo), philo[i].id);
+				pthread_mutex_unlock(philo->print);
+				exit(EXIT_FAILURE);
+			}
+			pthread_mutex_unlock(&philo[i].meal_time_mutex);
+			i++;
+			
+		}
+		usleep(20);
 	}
 	return (NULL);
 }
+
 
 void	*main_routine(void *arg)
 {
@@ -30,10 +53,10 @@ void	*main_routine(void *arg)
 	int		l_fork;
 
 	philo = arg;
-	while (philo->meals_eaten <= philo->num_times_eat)
+	while (philo->num_times_eat < 0 || philo->meals_eaten <= philo->num_times_eat)
 	{
 		l_fork = philo->id;
-		usleep(100);
+		usleep(1000);
 		pthread_mutex_lock(&philo->forks[l_fork]);
 		pthread_mutex_lock(philo->print);
 		printf(BLUE "%lld %d has taken a fork\n" WHITE, print_tmsp_ms(philo), philo->id);
@@ -46,7 +69,9 @@ void	*main_routine(void *arg)
 		printf(GREEN "%lld %d is eating\n" WHITE, print_tmsp_ms(philo), philo->id);
 		pthread_mutex_unlock(philo->print);
 		usleep(philo->t_eat * 1000);
+		pthread_mutex_lock(&philo->meal_time_mutex);
 		philo->time_of_last_meal = ms_time();
+		pthread_mutex_unlock(&philo->meal_time_mutex);
 		pthread_mutex_lock(philo->print);
 		pthread_mutex_unlock(philo->print);
 		pthread_mutex_lock(&philo->meals_eaten_mutex);
@@ -55,7 +80,7 @@ void	*main_routine(void *arg)
 		pthread_mutex_unlock(&philo->forks[l_fork]);
 		pthread_mutex_unlock(&philo->forks[(l_fork + 1) % philo->phil_num]);
 		pthread_mutex_lock(philo->print);
-		printf(WHITE "//%lld %d has eaten %d meals\n", print_tmsp_ms(philo), philo->id, philo->meals_eaten);
+		//printf(WHITE "//%lld %d has eaten %d meals\n", print_tmsp_ms(philo), philo->id, philo->meals_eaten);
 		pthread_mutex_unlock(philo->print);
 		if (philo->meals_eaten == philo->num_times_eat)
 			return (NULL);
@@ -66,7 +91,7 @@ void	*main_routine(void *arg)
 		pthread_mutex_lock(philo->print);
 		printf(RED "%lld %d is thinking\n" WHITE, print_tmsp_ms(philo), philo->id);
 		pthread_mutex_unlock(philo->print);
-		usleep(100);
+		usleep(2000);
 	}
 	return (NULL);
 }
@@ -74,19 +99,24 @@ void	*main_routine(void *arg)
 int	main_loop(t_philo *philo)
 {
 	int	i;
+	pthread_t monitor;
 
 	philo->threads = malloc(sizeof(*philo->threads) * philo->phil_num);
 	if (!philo->threads)
 		return (0);
 	i = 0;
+	
 	while (i < philo->phil_num)
 	{
+		pthread_mutex_init(&philo[i].meal_time_mutex, NULL);
+		pthread_mutex_init(&philo[i].meals_eaten_mutex, NULL);
 		philo[i].forks = philo->forks;
 		pthread_mutex_init(&philo->forks[i], NULL);
 		if (pthread_create(&philo->threads[i], NULL, &main_routine, &philo[i]) != 0)
 			return (perror("error creating thread"), 1);
 		i++;
 	}
+	pthread_create(&monitor, NULL, monitor_thread, philo);
 	i = 0;
 	while (i < philo->phil_num)
 	{
@@ -94,6 +124,7 @@ int	main_loop(t_philo *philo)
 			return (perror("error joining threads"), 1);
 		i++;
 	}
+	pthread_join(monitor, NULL);
 	//destroy all the mutexes after joining
 	pthread_mutex_destroy(philo->print);
 	free(philo->threads);
@@ -163,6 +194,7 @@ t_philo	*init_philo(char **argv, t_philo *philo, int argc)
 		philo[i].start = start;
 		philo[i].is_dead = 0;
 		philo[i].meals_eaten = 0;
+		philo[i].time_of_last_meal = ms_time();
 		// philo[i].data = data;
 		if (argc == 6)
 			philo[i].num_times_eat = ft_atoi(argv[5]);

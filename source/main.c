@@ -6,7 +6,7 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 16:17:45 by rojornod          #+#    #+#             */
-/*   Updated: 2025/07/08 16:52:33 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/07/09 16:14:56 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,42 +56,73 @@ void	*main_routine(void *arg)
 	while (philo->num_times_eat < 0 || philo->meals_eaten <= philo->num_times_eat)
 	{
 		l_fork = philo->id;
-		usleep(1000);
-		pthread_mutex_lock(&philo->forks[l_fork]);
-		pthread_mutex_lock(philo->print);
-		printf(BLUE "%lld %d has taken a fork\n" WHITE, print_tmsp_ms(philo), philo->id);
-		pthread_mutex_unlock(philo->print);
-		pthread_mutex_lock(&philo->forks[(l_fork + 1) % philo->phil_num]);
-		pthread_mutex_lock(philo->print);
-		printf(BLUE "%lld %d has taken a fork\n" WHITE, print_tmsp_ms(philo), philo->id);
-		pthread_mutex_unlock(philo->print);
+
+		if (philo->id % 2 == 0)
+		{		
+			pthread_mutex_lock(&philo->forks[l_fork] );
+			pthread_mutex_lock(philo->print);
+			printf(BLUE "%lld %d has taken a lfork\n" WHITE, print_tmsp_ms(philo), philo->id);
+			pthread_mutex_unlock(philo->print);
+		}
+		else
+		{
+			pthread_mutex_lock(&philo->forks[(l_fork + 1) % philo->phil_num]);
+			pthread_mutex_lock(philo->print);
+			printf(BLUE "%lld %d has taken a rfork\n" WHITE, print_tmsp_ms(philo), philo->id);
+			pthread_mutex_unlock(philo->print);
+		}
+		if (philo->id % 2 == 0)
+		{
+			pthread_mutex_lock(&philo->forks[(l_fork + 1) % philo->phil_num] );
+			pthread_mutex_lock(philo->print);
+			printf(BLUE "%lld %d has taken a rfork\n" WHITE, print_tmsp_ms(philo), philo->id);
+			pthread_mutex_unlock(philo->print);
+		}
+		else
+		{
+			pthread_mutex_lock(&philo->forks[l_fork]);
+			pthread_mutex_lock(philo->print);
+			printf(BLUE "%lld %d has taken a lfork\n" WHITE, print_tmsp_ms(philo), philo->id);
+			pthread_mutex_unlock(philo->print);
+		}
+		
 		pthread_mutex_lock(philo->print);
 		printf(GREEN "%lld %d is eating\n" WHITE, print_tmsp_ms(philo), philo->id);
 		pthread_mutex_unlock(philo->print);
-		usleep(philo->t_eat * 1000);
+		
 		pthread_mutex_lock(&philo->meal_time_mutex);
 		philo->time_of_last_meal = ms_time();
 		pthread_mutex_unlock(&philo->meal_time_mutex);
-		pthread_mutex_lock(philo->print);
-		pthread_mutex_unlock(philo->print);
+		
+		usleep(philo->t_eat * 1000);
+
 		pthread_mutex_lock(&philo->meals_eaten_mutex);
 		philo->meals_eaten++;
 		pthread_mutex_unlock(&philo->meals_eaten_mutex);
-		pthread_mutex_unlock(&philo->forks[l_fork]);
-		pthread_mutex_unlock(&philo->forks[(l_fork + 1) % philo->phil_num]);
-		pthread_mutex_lock(philo->print);
-		//printf(WHITE "//%lld %d has eaten %d meals\n", print_tmsp_ms(philo), philo->id, philo->meals_eaten);
-		pthread_mutex_unlock(philo->print);
+		
+		if (philo->id % 2 == 0)
+		{
+			pthread_mutex_unlock(&philo->forks[l_fork] );
+			pthread_mutex_unlock(&philo->forks[(l_fork + 1) % philo->phil_num]);
+		}
+		else
+		{
+			pthread_mutex_unlock(&philo->forks[(l_fork + 1) % philo->phil_num]);
+			pthread_mutex_unlock(&philo->forks[l_fork] );
+		}
 		if (philo->meals_eaten == philo->num_times_eat)
 			return (NULL);
 		pthread_mutex_lock(philo->print);
 		printf(YELLOW "%lld %d is sleeping\n" WHITE, print_tmsp_ms(philo), philo->id);
 		pthread_mutex_unlock(philo->print);
+
 		usleep(philo->t_sleep * 1000);
+
 		pthread_mutex_lock(philo->print);
 		printf(RED "%lld %d is thinking\n" WHITE, print_tmsp_ms(philo), philo->id);
 		pthread_mutex_unlock(philo->print);
-		usleep(2000);
+
+		usleep(100);
 	}
 	return (NULL);
 }

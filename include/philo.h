@@ -6,7 +6,7 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 16:17:42 by rojornod          #+#    #+#             */
-/*   Updated: 2025/07/08 14:52:44 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/07/10 15:30:23 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ typedef struct s_philo
 	int				phil_status;
 	long long		time_of_last_meal;
 	int				meals_eaten;
+	pthread_mutex_t	meal_status_mutex;
 	pthread_mutex_t	meals_eaten_mutex;
 	pthread_mutex_t	meal_time_mutex;
 	pthread_t		*threads;

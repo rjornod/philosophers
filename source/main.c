@@ -6,7 +6,7 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 16:17:45 by rojornod          #+#    #+#             */
-/*   Updated: 2025/07/10 16:30:05 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/07/11 16:59:47 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,6 +164,12 @@ int	main_loop(t_philo *philo)
 		pthread_mutex_init(&philo[i].meal_time_mutex, NULL);
 		philo[i].forks = philo->forks;
 		pthread_mutex_init(&philo->forks[i], NULL);
+		
+		i++;
+	}
+	i = 0;
+	while (i < philo->phil_num)
+	{
 		if (pthread_create(&philo->threads[i], NULL, &main_routine, &philo[i]) != 0)
 			return (perror("error creating thread"), 1);
 		i++;

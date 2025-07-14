@@ -6,7 +6,7 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/23 17:34:30 by rojornod          #+#    #+#             */
-/*   Updated: 2025/07/04 16:13:40 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/07/14 12:23:53 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,11 @@ static int	check_positive_val(char **argv, int argc)
 	time_to_eat = ft_atoi(argv[3]);
 	time_to_sleep = ft_atoi(argv[4]);
 	if (argc == 6)
+	{
 		number_times_to_eat = ft_atoi(argv[5]);
+		if (number_times_to_eat <= 0)
+			return (0);
+	}
 	if ((number_of_philosophers <= 0) || (time_to_die <= 0)
 		|| (time_to_eat <= 0)
 		|| (time_to_sleep <= 0))

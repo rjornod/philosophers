@@ -6,7 +6,7 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 16:17:45 by rojornod          #+#    #+#             */
-/*   Updated: 2025/07/11 16:59:47 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/07/14 15:19:34 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,11 +44,13 @@ void	*monitor_thread(void *arg)
 				if (philo[i].phil_status == 1)
 					nbr_phils_done++;
 				pthread_mutex_unlock(&philo->meal_status_mutex);
-				if (nbr_phils_done == philo->phil_num){
+				if (nbr_phils_done == philo->phil_num)
+				{
 					pthread_mutex_lock(philo->print);
 					printf("exit success\n");
 					pthread_mutex_unlock(philo->print);
-					exit(EXIT_SUCCESS);}
+					return (NULL);
+				}
 			}
 			i++;
 		}
@@ -175,17 +177,9 @@ int	main_loop(t_philo *philo)
 		i++;
 	}
 	pthread_create(&monitor, NULL, monitor_thread, philo);
-	i = 0;
-	while (i < philo->phil_num)
-	{
-		if (pthread_join(philo->threads[i], NULL) != 0)
-			return (perror("error joining threads"), 1);
-		i++;
-	}
 	pthread_join(monitor, NULL);
 	//destroy all the mutexes after joining
-	pthread_mutex_destroy(philo->print);
-	free(philo->threads);
+	cleanup(philo);
 	return (1);
 }
 
@@ -195,7 +189,7 @@ int	main(int argc, char **argv)
 	t_data		*data;
 
 	philo = NULL;
-	data = malloc(sizeof data);
+	data = malloc(sizeof *data);
 	memset(data, 0, sizeof(*data));
 	philo = input_validation(argc, argv);
 	if (!philo)
@@ -206,8 +200,9 @@ int	main(int argc, char **argv)
 		data->start = ms_time();
 		main_loop(philo);
 		//pthread_mutex_destroy(&philo->print);
+		free(data);
 	}
-	return (free(philo), 0);
+	return (0);
 }
 
 static t_philo *allocate(t_philo *philo, int phil_n)

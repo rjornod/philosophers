@@ -1,7 +1,7 @@
 NAME = philo
 
 CC = cc
-FLAGS = -Wall -Wextra -Werror -g -pthread -fsanitize=thread
+FLAGS = -Wall -Wextra -Werror -g -pthread
 # -fsanitize=thread
 
 SRC = main.c utils.c input_check.c

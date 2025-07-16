@@ -4,7 +4,7 @@ CC = cc
 FLAGS = -Wall -Wextra -Werror -g -pthread
 # -fsanitize=thread
 
-SRC = main.c utils.c input_check.c
+SRC = main.c utils.c input_check.c init.c
 SRC_PATH = source
 OBJ_PATH = obj
 OBJ = $(SRC:%.c=$(OBJ_PATH)/%.o)
@@ -24,7 +24,7 @@ $(NAME): $(OBJ)
 clean:
 	@rm -f $(OBJ)
 	@rm -rf $(OBJ_PATH)
-	@echo CLEANED SUCCESSFULLY
+	@echo SUCCESSFULLY CLEANED
 
 fclean: clean
 	@rm -f $(NAME)

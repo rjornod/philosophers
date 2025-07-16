@@ -6,7 +6,7 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 16:17:42 by rojornod          #+#    #+#             */
-/*   Updated: 2025/07/14 14:18:02 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/07/15 16:16:16 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <stdio.h>
 # include <string.h>
 # include <sys/time.h>
+# include <stdbool.h>
 # include <unistd.h>
 # define RED "\e[91m"
 # define GREEN "\x1b[32m"
@@ -27,6 +28,7 @@
 typedef struct s_data
 {
 	int				dead;
+	pthread_mutex_t	dead_mutex;
 	long long		start;
 }	t_data;
 
@@ -43,6 +45,7 @@ typedef struct s_philo
 	int				phil_status;
 	long long		time_of_last_meal;
 	int				meals_eaten;
+	
 	pthread_mutex_t	meal_status_mutex;
 	pthread_mutex_t	meals_eaten_mutex;
 	pthread_mutex_t	meal_time_mutex;
@@ -68,6 +71,6 @@ void				*monitor_thread(void *arg);
 int					main_loop(t_philo *philo);
 
 //cleanup
-int				cleanup(t_philo *philo);
+void				cleanup(t_philo *philo);
 
 #endif

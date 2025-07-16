@@ -6,7 +6,7 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 16:17:38 by rojornod          #+#    #+#             */
-/*   Updated: 2025/07/14 15:07:38 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/07/15 16:05:13 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,20 +65,14 @@ long long	print_tmsp_ms(t_philo *philo)
 	return (end - philo->start);
 }
 
-int cleanup(t_philo *philo)
+void cleanup(t_philo *philo)
 {
 	int	i;
 	int	num;
 	
+	num = 0;
 	i = 0;
-	num = philo->phil_num;
-	while (i < num)
-	{
-		if (pthread_join(philo->threads[i], NULL) != 0)
-			return (perror("error joining threads"), 1);
-		i++;
-	}
-	i = 0;
+	//printf("destroying mutexes\n");
 	while (i < num)
 	{
 		pthread_mutex_destroy(&philo[i].meal_status_mutex);
@@ -92,5 +86,5 @@ int cleanup(t_philo *philo)
 	free(philo->print);
 	free(philo->threads);
 	free(philo);
-	return (1);
+	exit(EXIT_SUCCESS);
 }

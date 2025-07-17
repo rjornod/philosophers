@@ -6,7 +6,7 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 16:17:38 by rojornod          #+#    #+#             */
-/*   Updated: 2025/07/15 16:05:13 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/07/17 14:44:53 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,9 +70,9 @@ void cleanup(t_philo *philo)
 	int	i;
 	int	num;
 	
-	num = 0;
+	num = philo->phil_num;
 	i = 0;
-	//printf("destroying mutexes\n");
+	printf("destroying mutexes\n");
 	while (i < num)
 	{
 		pthread_mutex_destroy(&philo[i].meal_status_mutex);
@@ -87,4 +87,25 @@ void cleanup(t_philo *philo)
 	free(philo->threads);
 	free(philo);
 	exit(EXIT_SUCCESS);
+}
+
+void	ft_usleep(unsigned int usec)
+{
+	 struct timeval start, now;
+    unsigned int elapsed = 0;
+
+    gettimeofday(&start, NULL);
+    if (usec > 2000)
+        usleep(usec - 2000);
+
+
+    gettimeofday(&now, NULL);
+    elapsed = (now.tv_sec - start.tv_sec) * 1000000 +
+		(now.tv_usec - start.tv_usec);
+
+    while (elapsed < usec) {
+		gettimeofday(&now, NULL);
+		elapsed = (now.tv_sec - start.tv_sec) * 1000000 +
+		(now.tv_usec - start.tv_usec);
+    }
 }

@@ -6,7 +6,7 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 16:17:42 by rojornod          #+#    #+#             */
-/*   Updated: 2025/07/15 16:16:16 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/07/17 14:37:29 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,11 +59,12 @@ typedef struct s_philo
 t_philo				*input_validation(int argc, char **argv);
 t_philo				*init_philo(char **argv, t_philo *philo, int argc);
 int					ft_atoi(const char *str);
-
+void				init_start_time(t_philo *philo);
 //time of day
 long long			ms_time(void);
 long long			print_tmsp_ms(t_philo *philo);
 long long			time_since_last_meal(long long last_meal);
+void				ft_usleep(unsigned int usec);
 
 //threads
 void				*monitor_thread(void *arg);
@@ -72,5 +73,7 @@ int					main_loop(t_philo *philo);
 
 //cleanup
 void				cleanup(t_philo *philo);
+
+
 
 #endif

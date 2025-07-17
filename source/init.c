@@ -6,7 +6,7 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/15 14:58:40 by rojornod          #+#    #+#             */
-/*   Updated: 2025/07/15 15:31:33 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/07/17 11:51:01 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ t_philo	*init_philo(char **argv, t_philo *philo, int argc)
 {
 	int				temp_phil_num;
 	int				i;
-	long long		start;
+	//long long		start;
 	
 	i = 0;
 	temp_phil_num = ft_atoi(argv[1]);
@@ -43,7 +43,7 @@ t_philo	*init_philo(char **argv, t_philo *philo, int argc)
 	pthread_mutex_init(philo->forks, NULL);
 	pthread_mutex_init(philo->print, NULL);
 	pthread_mutex_init(&philo->data->dead_mutex, NULL);
-	start =  ms_time();
+	// start =  ms_time();
 	while (i < temp_phil_num)
 	{
 		philo[i].id = i;
@@ -52,7 +52,7 @@ t_philo	*init_philo(char **argv, t_philo *philo, int argc)
 		philo[i].t_eat = ft_atoi(argv[3]);
 		philo[i].t_sleep = ft_atoi(argv[4]);
 		philo[i].print = philo->print;
-		philo[i].start = start;
+		//philo[i].start = start;
 		philo[i].is_dead = 0;
 		philo[i].meals_eaten = 0;
 		philo[i].time_of_last_meal = ms_time();
@@ -73,5 +73,19 @@ t_philo	*init_philo(char **argv, t_philo *philo, int argc)
 	printf("[time to sleep] %d\n", philo->t_sleep);
 	printf("[number of times to eat] %d\n", philo->num_times_eat);
 	return (philo);
+}
+
+void	init_start_time(t_philo *philo)
+{
+	int			i;
+	long long	start;
+
+	i = 0;
+	start =  ms_time();
+	while (i < philo->phil_num)
+	{
+		philo[i].start = start;
+		i++;
+	}
 }
 

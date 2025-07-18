@@ -6,7 +6,7 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 16:17:38 by rojornod          #+#    #+#             */
-/*   Updated: 2025/07/17 14:44:53 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/07/18 15:00:41 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,4 +108,33 @@ void	ft_usleep(unsigned int usec)
 		elapsed = (now.tv_sec - start.tv_sec) * 1000000 +
 		(now.tv_usec - start.tv_usec);
     }
+}
+
+void	update_dead(t_philo *philo)
+{
+	int	i;
+	int	num;
+	
+	i = 0;
+	pthread_mutex_lock(&philo->data->dead_mutex);
+	num = philo->phil_num;
+	pthread_mutex_unlock(&philo->data->dead_mutex);
+	
+	pthread_mutex_lock(philo->print);
+	printf("updating....\n");
+	pthread_mutex_unlock(philo->print);
+
+	pthread_mutex_lock(philo->print);
+	printf("[%d]\n", num);
+	pthread_mutex_unlock(philo->print);
+	while (i < num)
+	{
+		pthread_mutex_lock(&philo[i].update_status_mutex);
+		philo[i].is_dead = 1;
+		pthread_mutex_unlock(&philo[i].update_status_mutex);
+		pthread_mutex_lock(philo->print);
+		printf("---updated\n");
+		pthread_mutex_unlock(philo->print);
+		i++;
+	}
 }

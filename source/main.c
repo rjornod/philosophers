@@ -6,7 +6,7 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 16:17:45 by rojornod          #+#    #+#             */
-/*   Updated: 2025/07/17 17:02:39 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/07/18 15:33:03 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,36 +22,38 @@ void	*monitor_thread(void *arg)
 
 	philo = arg;
 	num = philo->phil_num;
-	pthread_mutex_lock(&philo->data->dead_mutex);
-	philo->data->dead = 0;
-	pthread_mutex_unlock(&philo->data->dead_mutex);
+	// pthread_mutex_lock(&philo->data->dead_mutex);
+	// philo->data->dead = 0;
+	// pthread_mutex_unlock(&philo->data->dead_mutex);
 	while (1)
 	{
 		nbr_phils_done = 0;
 		i = 0;
 		while (i < num)
 		{
-			pthread_mutex_lock(&philo[i].meal_time_mutex);
 			now = ms_time();		
+			pthread_mutex_lock(&philo[i].meal_time_mutex);
 			if ((now - (philo[i].time_of_last_meal)) > philo->t_die && philo[i].phil_status != 1)
 			{
-				pthread_mutex_lock(&philo->data->dead_mutex);
-				philo->data->dead = 1;
-				pthread_mutex_unlock(&philo->data->dead_mutex);
+				pthread_mutex_unlock(&philo[i].meal_time_mutex);
+				// pthread_mutex_lock(&philo->data->dead_mutex);
+				// philo->data->dead = 1;
+				// pthread_mutex_unlock(&philo->data->dead_mutex);
 				
 				pthread_mutex_lock(philo->print);
 				printf(WHITE "%lld %d died\n" WHITE, print_tmsp_ms(philo), philo[i].id);
 				pthread_mutex_unlock(philo->print);
+				update_dead(philo);
 				
-				return (printf("returning dead monitor\n"),NULL);
+				return (NULL);
 			}
 			pthread_mutex_unlock(&philo[i].meal_time_mutex);
 			if (philo[i].num_times_eat != -1)
 			{					
 				pthread_mutex_lock(&philo[i].meal_status_mutex);
-				
 				if (philo[i].phil_status == 1)
 				{
+					pthread_mutex_unlock(&philo[i].meal_status_mutex);
 					pthread_mutex_lock(philo->print);
 					nbr_phils_done++;
 					pthread_mutex_unlock(philo->print);
@@ -62,9 +64,9 @@ void	*monitor_thread(void *arg)
 					// pthread_mutex_lock(&philo->data->dead_mutex);
 					// philo->data->dead = 1;
 					// pthread_mutex_unlock(&philo->data->dead_mutex);
-					pthread_mutex_lock(philo->print);
-					printf("%lld exit success\n", print_tmsp_ms(philo));
-					pthread_mutex_unlock(philo->print);
+					// pthread_mutex_lock(philo->print);
+					// printf("%lld exit success\n", print_tmsp_ms(philo));
+					// pthread_mutex_unlock(philo->print);
 					return (NULL);
 				}
 			}
@@ -77,15 +79,33 @@ void	*monitor_thread(void *arg)
 
 static bool philo_dead(t_philo *philo)
 {
+	int	i;
+	int	num;
+
+	i = 0;
+	
 	pthread_mutex_lock(&philo->data->dead_mutex);
-	printf("[%d] checking\n", philo->data->dead);
-	if (philo->data->dead == 1)
-	{
-		printf("returning philo_dead\n");
-		pthread_mutex_unlock(&philo->data->dead_mutex);
-		return (true);
-	}
+	num = philo->phil_num;
 	pthread_mutex_unlock(&philo->data->dead_mutex);
+	
+	while (i < num)
+	{
+		pthread_mutex_lock(philo->print);
+		//printf("checking\n");
+		pthread_mutex_unlock(philo->print);
+		
+		pthread_mutex_lock(&philo[i].update_status_mutex);
+		if (philo[i].is_dead == 1)
+		{
+			pthread_mutex_unlock(&philo[i].update_status_mutex);
+			pthread_mutex_lock(philo->print);
+			printf("dead check = true\n");
+			pthread_mutex_unlock(philo->print);
+			return (true);
+		}
+		pthread_mutex_unlock(&philo[i].update_status_mutex);
+		i++;
+	}
 	return (false);
 }
 
@@ -119,14 +139,13 @@ void	*main_routine(void *arg)
 		{
 			pthread_mutex_lock(&philo->meal_status_mutex);
 			philo->phil_status = 1;
-			
 			pthread_mutex_unlock(&philo->meal_status_mutex);
-			return (printf("philo is done\n"), NULL);
+			return (NULL);
 		}
 		
 		
 		if (philo_dead(philo))
-			return (printf("returning2\n"), NULL);
+			return (NULL);
 			
 		l_fork = philo->id;
 
@@ -134,11 +153,11 @@ void	*main_routine(void *arg)
 		{
 			
 			
-			pthread_mutex_lock(&philo->forks[l_fork] );
+			pthread_mutex_lock(&philo->forks[l_fork] );  //first fork
 			if (philo_dead(philo))
 			{
 				pthread_mutex_unlock(&philo->forks[l_fork] );
-				return (printf("returning dead main 4\n"),NULL);
+				return (NULL);
 			}
 			pthread_mutex_lock(philo->print);
 			printf(BLUE "%lld %d has taken a fork\n" WHITE, print_tmsp_ms(philo), philo->id);
@@ -147,14 +166,14 @@ void	*main_routine(void *arg)
 			if (philo_dead(philo))
 			{
 				pthread_mutex_unlock(&philo->forks[l_fork] );
-				return (printf("returning dead main 4\n"),NULL);
+				return (NULL);
 			}
 			
-			pthread_mutex_lock(&philo->forks[(l_fork + 1) % philo->phil_num] );
+			pthread_mutex_lock(&philo->forks[(l_fork + 1) % philo->phil_num] ); //second fork
 			if (philo_dead(philo))
 			{
 				pthread_mutex_unlock(&philo->forks[(l_fork + 1) % philo->phil_num]);
-				return (printf("returning dead main taken one fork 3\n"),NULL);
+				return (NULL);
 			}
 			
 			pthread_mutex_lock(philo->print);
@@ -166,7 +185,7 @@ void	*main_routine(void *arg)
 				pthread_mutex_unlock(&philo->forks[l_fork]);
 				pthread_mutex_unlock(&philo->forks[(l_fork + 1) % philo->phil_num]);
 				exit(EXIT_FAILURE);
-				return (printf("returning dead main taken one fork 3\n"),NULL);
+				return (NULL);
 			}
 		}
 		else
@@ -175,48 +194,49 @@ void	*main_routine(void *arg)
 			if (philo_dead(philo))
 			{
 				pthread_mutex_unlock(&philo->forks[(l_fork + 1) % philo->phil_num]);
-				return (printf("returning dead main taken one fork 3\n"),NULL);
+				return (NULL);
 			}
 
 			pthread_mutex_lock(philo->print);
 			printf(BLUE "%lld %d has taken a fork\n" WHITE, print_tmsp_ms(philo), philo->id);
+			pthread_mutex_unlock(philo->print);
 			if (philo_dead(philo))
 			{
 				pthread_mutex_unlock(&philo->forks[(l_fork + 1) % philo->phil_num]);
-				return (printf("returning dead main taken one fork 3\n"),NULL);
+				return (NULL);
 			}
-			pthread_mutex_unlock(philo->print);
 			
 			pthread_mutex_lock(&philo->forks[l_fork]);
 			if (philo_dead(philo))
 			{
 				pthread_mutex_unlock(&philo->forks[(l_fork + 1) % philo->phil_num]);
 				pthread_mutex_unlock(&philo->forks[l_fork] );
-				return (printf("returning dead main 4\n"),NULL);
+				return (NULL);
 			}
 			pthread_mutex_lock(philo->print);
 			printf(BLUE "%lld %d has taken a fork\n" WHITE, print_tmsp_ms(philo), philo->id);
+			pthread_mutex_unlock(philo->print);
 			if (philo_dead(philo))
 			{
 				pthread_mutex_unlock(&philo->forks[(l_fork + 1) % philo->phil_num]);
 				pthread_mutex_unlock(&philo->forks[l_fork] );
-				return (printf("returning dead main 4\n"),NULL);
+				return (NULL);
 			}
-			pthread_mutex_unlock(philo->print);
 		}
 		
 		pthread_mutex_lock(&philo->meals_eaten_mutex);
 		philo->meals_eaten++;
 		pthread_mutex_unlock(&philo->meals_eaten_mutex);
 		if (philo_dead(philo))
-				return (printf("returning dead main 6\n"),NULL);
+				return (NULL);
 				
 		pthread_mutex_lock(philo->print);
-		if (philo_dead(philo))
-				return (printf("returning dead main 6\n"),NULL);
-
 		printf(GREEN "%lld %d is eating\n" WHITE, print_tmsp_ms(philo), philo->id);
 		pthread_mutex_unlock(philo->print);
+		
+		if (philo_dead(philo))
+				return (NULL);
+
 
 		pthread_mutex_lock(&philo->meal_time_mutex);
 		philo->time_of_last_meal = ms_time();
@@ -227,29 +247,29 @@ void	*main_routine(void *arg)
 		if (philo->id % 2 == 0)
 		{
 			if (philo_dead(philo))
-				return (printf("returning dead main 6\n"),NULL);
+				return (NULL);
 			pthread_mutex_unlock(&philo->forks[l_fork] );
 			if (philo_dead(philo))
-				return (printf("returning dead main 6\n"),NULL);
+				return (NULL);
 			pthread_mutex_unlock(&philo->forks[(l_fork + 1) % philo->phil_num]);
 			if (philo_dead(philo))
-				return (printf("returning dead main 7\n"),NULL);
+				return (NULL);
 		}
 		else
 		{
 			if (philo_dead(philo))
-				return (printf("returning dead main 6\n"),NULL);
+				return (NULL);
 			pthread_mutex_unlock(&philo->forks[(l_fork + 1) % philo->phil_num]);
 			if (philo_dead(philo))
-				return (printf("returning dead main 6\n"),NULL);
+				return (NULL);
 			pthread_mutex_unlock(&philo->forks[l_fork] );
 			if (philo_dead(philo))
-				return (printf("returning dead main 8\n"),NULL);
+				return (NULL);
 		}
 
 		
 		if (philo_dead(philo))
-				return (printf("returning dead main 1\n"),NULL);
+				return (NULL);
 		pthread_mutex_lock(philo->print);
 		printf(YELLOW "%lld %d is sleeping\n" WHITE, print_tmsp_ms(philo), philo->id);
 		pthread_mutex_unlock(philo->print);
@@ -257,24 +277,25 @@ void	*main_routine(void *arg)
 		usleep(philo->t_sleep * 1000);
 
 		if (philo_dead(philo))
-				return (printf("returning dead main 1\n"),NULL);
+				return (NULL);
 		pthread_mutex_lock(philo->print);
 		printf(RED "%lld %d is thinking\n" WHITE, print_tmsp_ms(philo), philo->id);
 		pthread_mutex_unlock(philo->print);
 
 		if (philo_dead(philo))
-				return (printf("returning dead main 6\n"),NULL);
-				
+				return (NULL);
+	
+		pthread_mutex_lock(&philo->meal_status_mutex);
 		if (philo->meals_eaten == philo->num_times_eat)
 		{
+			pthread_mutex_unlock(&philo->meal_status_mutex);
 			pthread_mutex_lock(&philo->meal_status_mutex);
 			philo->phil_status = 1;
 			pthread_mutex_unlock(&philo->meal_status_mutex);
-			return ( NULL);
+			return (NULL);
 		}
-		//p(100);
 	}
-	return (printf("returning3\n"), NULL);
+	return (NULL);
 }
 
 int	main_loop(t_philo *philo)

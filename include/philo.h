@@ -6,7 +6,7 @@
 /*   By: rojornod <rojornod@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 16:17:42 by rojornod          #+#    #+#             */
-/*   Updated: 2025/07/17 14:37:29 by rojornod         ###   ########.fr       */
+/*   Updated: 2025/07/18 16:00:53 by rojornod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@
 
 typedef struct s_data
 {
-	int				dead;
+	 int 			dead;
 	pthread_mutex_t	dead_mutex;
 	long long		start;
 }	t_data;
@@ -46,6 +46,7 @@ typedef struct s_philo
 	long long		time_of_last_meal;
 	int				meals_eaten;
 	
+	pthread_mutex_t	update_status_mutex;
 	pthread_mutex_t	meal_status_mutex;
 	pthread_mutex_t	meals_eaten_mutex;
 	pthread_mutex_t	meal_time_mutex;
@@ -74,6 +75,7 @@ int					main_loop(t_philo *philo);
 //cleanup
 void				cleanup(t_philo *philo);
 
-
+//dead
+void				update_dead(t_philo *philo);
 
 #endif
